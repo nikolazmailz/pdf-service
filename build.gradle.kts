@@ -44,6 +44,10 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
+    // BouncyCastle for CMS/CAdES parsing and GOST support
+//    implementation("org.bouncycastle:bcprov-jdk15on:1.70")
+//    implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
+
     // cripto hash
     // провайдер (криптография)
     implementation("org.bouncycastle:bcprov-jdk18on:1.83")
