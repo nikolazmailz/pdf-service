@@ -1,7 +1,7 @@
 package com.signservice.infra.repository
 
 import com.signservice.domain.SignatureRepository
-import com.signservice.domain.model.Signature
+import com.signservice.domain.Signature
 import io.r2dbc.spi.Readable
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitOne

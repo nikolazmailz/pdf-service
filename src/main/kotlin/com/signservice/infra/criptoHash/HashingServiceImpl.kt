@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 @Component
 class HashingServiceImpl : HashingService {
 
-    override suspend fun calculateGOST3411_2012_256Hash(bytes: ByteArray): String {
+    override suspend fun calculateGostHash(bytes: ByteArray): String {
         val digest: Digest = GOST3411_2012_256Digest()
         digest.update(bytes, 0, bytes.size)
         val hash = ByteArray(digest.digestSize)

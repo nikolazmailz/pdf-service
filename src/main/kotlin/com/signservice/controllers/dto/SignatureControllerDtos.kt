@@ -1,22 +1,24 @@
-package com.signservice.domain.model
+package com.signservice.controllers.dto
 
-import java.time.Instant
 import java.util.UUID
 
-data class Signature(
-    val id: UUID,
+data class SignatureCreationRequestDto(
     val signerName: String,
     val signerPosition: String,
     val signerOrganization: String,
     val certificateSerialNumber: String,
-    val certificateValidFrom: Instant,
-    val certificateValidTo: Instant,
+    val certificateValidFrom: String,
+    val certificateValidTo: String,
     val isCertificateValidAtSigningTime: Boolean,
-    val signedAt: Instant,
-    val signatureBytes: ByteArray?,
+    val signedAt: String,
+    val signatureBytesBase64: String,
     val signatureBase64: String?,
     val fileId: String,
     val fileName: String,
     val fileHash: String
+)
+
+data class SignatureCreatedResponseDto(
+    val id: UUID
 )
 

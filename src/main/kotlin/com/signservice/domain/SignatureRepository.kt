@@ -1,6 +1,6 @@
 package com.signservice.domain
 
-import com.signservice.domain.model.Signature
+import com.signservice.domain.Signature
 import java.util.UUID
 
 interface SignatureRepository {

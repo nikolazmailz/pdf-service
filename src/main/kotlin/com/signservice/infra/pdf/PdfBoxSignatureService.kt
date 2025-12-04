@@ -1,7 +1,7 @@
 package com.signservice.infra.pdf
 
 import com.signservice.application.service.PdfSignatureService
-import com.signservice.domain.model.Signature
+import com.signservice.domain.Signature
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.pdfbox.pdmodel.PDDocument

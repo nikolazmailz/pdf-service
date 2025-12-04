@@ -9,17 +9,6 @@ import java.security.Security
 @Component
 class GostHashingService : HashingService {
 
-//    companion object {
-//        private val providerName = BouncyCastleProvider().name
-//        private const val algorithm = "GOST3411-2012-256"
-//
-//        init {
-//            if (Security.getProvider(providerName) == null) {
-//                Security.addProvider(BouncyCastleProvider())
-//            }
-//        }
-//    }
-
     companion object {
         private val provider = BouncyCastleProvider()
         private val providerName = provider.name
@@ -32,7 +21,7 @@ class GostHashingService : HashingService {
         }
     }
 
-    override suspend fun calculateGOST3411_2012_256Hash(bytes: ByteArray): String {
+    override suspend fun calculateGostHash(bytes: ByteArray): String {
         // TODO: consider running on a dedicated dispatcher if hashing becomes CPU-heavy.
         val digest: MessageDigest = MessageDigest.getInstance(algorithm, providerName)
         return digest.digest(bytes).toHex()

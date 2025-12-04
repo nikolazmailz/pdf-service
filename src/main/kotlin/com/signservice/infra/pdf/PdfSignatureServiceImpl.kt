@@ -1,7 +1,7 @@
 package com.signservice.infra.pdf
 
 import com.signservice.application.service.PdfSignatureService
-import com.signservice.domain.model.Signature
+import com.signservice.domain.Signature
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.common.PDRectangle
