@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardOpenOption
 import java.time.Instant
 import java.util.Base64
 import java.util.UUID
@@ -47,6 +50,21 @@ internal class SignedPdfE2ETest : BaseE2ETest() {
         assertTrue(result.size >= 4)
         val pdfPrefix = result.copyOfRange(0, 4)
         assertTrue(pdfPrefix.contentEquals("%PDF".toByteArray()))
+
+        val outputDir = Paths.get("build", "test-pdfs")
+        Files.createDirectories(outputDir)
+
+        val outputFileName = fileName.replace(".docx", ".pdf")
+        val outputPath = outputDir.resolve(outputFileName)
+
+        Files.write(
+            outputPath,
+            result,
+            StandardOpenOption.CREATE,
+            StandardOpenOption.TRUNCATE_EXISTING,
+            StandardOpenOption.WRITE
+        )
+        println("Saved signed PDF to: $outputPath")
     }
 
     private fun createRequest(

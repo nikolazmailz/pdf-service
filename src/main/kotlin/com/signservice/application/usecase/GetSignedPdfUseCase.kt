@@ -1,6 +1,6 @@
 package com.signservice.application.usecase
 
-import PoiDocxToPdfConverter
+import com.signservice.application.pdf.DocxToPdfConverter
 import com.signservice.application.pdf.PdfSignatureService
 import com.signservice.domain.SignatureRepository
 import com.signservice.infra.files.FilesClient
@@ -12,7 +12,7 @@ class GetSignedPdfUseCase(
     private val signatureRepository: SignatureRepository,
     private val filesClient: FilesClient,
     private val pdfSignatureService: PdfSignatureService,
-    private val poiDocxToPdfConverter: PoiDocxToPdfConverter,
+    private val poiDocxToPdfConverter: DocxToPdfConverter,
 ) {
 
     suspend fun execute(signatureId: UUID): SignedPdfDto {

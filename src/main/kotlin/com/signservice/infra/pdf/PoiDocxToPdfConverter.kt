@@ -34,9 +34,6 @@ class PoiDocxToPdfConverter : DocxToPdfConverter {
                     val fontSize = 11f
                     val leading = fontSize * 1.4f
 
-                    // todo
-//                    val font: PDFont = PDType1Font(Standard14Fonts.FontName.HELVETICA)
-
                     val fontStream = this::class.java.getResourceAsStream("/fonts/DejaVuSans.ttf")
                         ?: error("Font /fonts/DejaVuSans.ttf not found in resources")
 
@@ -48,7 +45,7 @@ class PoiDocxToPdfConverter : DocxToPdfConverter {
                         content.newLineAtOffset(startX, currentY)
 
                         // Пробегаемся по абзацам DOCX и просто выводим текст
-                        for (paragraph in xwpf.paragraphs) {
+                        outer@ for (paragraph in xwpf.paragraphs) {
                             val text = paragraph.text
                             if (text.isNullOrBlank()) {
                                 // пустой абзац -> просто перенос строки
@@ -57,11 +54,32 @@ class PoiDocxToPdfConverter : DocxToPdfConverter {
                                 continue
                             }
 
+                            val lines = text
+                                .replace("\r\n", "\n")
+                                .replace("\r", "")
+                                .replace("\t", "    ")
+                                .split('\n')
+
                             // Примитивный перенос строк: один абзац = одна строка в PDF
                             // (при желании можно добавить разбиение по ширине страницы)
-                            content.showText(text)
-                            content.newLineAtOffset(0f, -leading)
-                            currentY -= leading
+//                            val cleanText = text.replace("\r\n", "").replace("\r", "").replace("\n", "")
+//                            content.showText(cleanText)
+//                            content.newLineAtOffset(0f, -leading)
+//                            currentY -= leading
+
+                            for (line in lines) {
+                                if (currentY - leading < mediaBox.lowerLeftY + margin) {
+                                    // Не осталось места под ещё одну строку — выходим из всего цикла
+                                    break@outer
+                                }
+
+                                val cleanLine = line.trimEnd() // без хвостовых пробелов
+
+                                // Даже если строка пустая, showText("") — ок, просто ничего не нарисует
+                                content.showText(cleanLine)
+                                content.newLineAtOffset(0f, -leading)
+                                currentY -= leading
+                            }
 
                             // Если дошли до низа страницы — создаём новую
                             if (currentY < mediaBox.lowerLeftY + margin) {

@@ -7,12 +7,15 @@ import kotlinx.coroutines.withContext
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.common.PDRectangle
+import org.apache.pdfbox.pdmodel.font.PDFont
+import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.springframework.stereotype.Component
 import java.awt.Color
 import java.io.ByteArrayOutputStream
 import java.time.format.DateTimeFormatter
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts
 import org.apache.pdfbox.pdmodel.font.PDType1Font
+import java.time.ZoneId
 
 @Component
 class PdfBoxSignatureService : PdfSignatureService {
@@ -23,12 +26,19 @@ class PdfBoxSignatureService : PdfSignatureService {
         original: ByteArray,
         signature: Signature
     ): ByteArray = withContext(Dispatchers.IO) {
+
         // PDFBox 3.x: грузим через Loader, прямо из ByteArray
         Loader.loadPDF(original).use { document ->
             if (document.numberOfPages == 0) {
                 // Нечего штамповать – возвращаем оригинал
                 return@withContext original
             }
+
+            val fontStream = this::class.java.getResourceAsStream("/fonts/DejaVuSans.ttf")
+                ?: error("Font /fonts/DejaVuSans.ttf not found in resources")
+
+            val font: PDFont = PDType0Font.load(document, fontStream, true) // embed = true
+
 
             val page = document.getPage(0)
             val mediaBox: PDRectangle = page.mediaBox ?: PDRectangle.A4
@@ -56,9 +66,13 @@ class PdfBoxSignatureService : PdfSignatureService {
 
                 // Текст штампа
                 content.beginText()
-                content.setFont(PDType1Font(Standard14Fonts.FontName.HELVETICA), 11f)
+                content.setFont(font, 11f)
                 content.setNonStrokingColor(Color.BLACK)
                 content.newLineAtOffset(stampX + 8f, stampY + stampHeight - 16f)
+
+                val textFormatter = DateTimeFormatter
+                    .ofPattern("dd.MM.yyyy HH:mm:ss")
+                    .withZone(ZoneId.systemDefault())
 
                 val signedAtText = signature.signedAt
                     ?.let { textFormatter.format(it) }
