@@ -38,7 +38,7 @@ dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
-
+    implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
 
     // Jackson
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

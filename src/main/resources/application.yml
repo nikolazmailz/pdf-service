@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: pdf-service
@@ -8,8 +11,12 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:/db/changelog/db.changelog-master.yaml
-server:
-  port: 8080
+
+converter:
+  base-url: http://document-converter-service:8080
+  connect-timeout-ms: 5000
+  read-timeout-ms: 60000
+
 logging:
   level:
     root: INFO

@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  document-converter-service:
+    image: document-converter-service:latest
+    container_name: document-converter-service
+    ports:
+      - "8080:8080"    # если хочешь смотреть логи и дебажить
+    networks:
+      - internal
+
+  pdf-service:
+    image: pdf-service:latest
+    container_name: pdf-service
+    environment:
+      - CONVERTER_BASE_URL=http://document-converter-service:8080
+    depends_on:
+      - document-converter-service
+    ports:
+      - "8081:8080"    # <-- клиент будет ходить сюда
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
