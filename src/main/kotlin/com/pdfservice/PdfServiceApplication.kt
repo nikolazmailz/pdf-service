@@ -4,9 +4,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class SignServiceApplication
+class PdfServiceApplication
 
 fun main(args: Array<String>) {
-    runApplication<SignServiceApplication>(*args)
+    runApplication<PdfServiceApplication>(*args)
 }
 

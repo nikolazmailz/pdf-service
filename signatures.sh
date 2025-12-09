@@ -1,0 +1,19 @@
+#!/bin/bash
+
+curl -X POST "http://localhost:8081/api/v1/signatures" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "signerName": "Иван Иванов",
+    "signerPosition": "Главный инженер",
+    "signerOrganization": "ООО Ромашка",
+    "certificateSerialNumber": "40271452401",
+    "certificateValidFrom": "2024-01-01T00:00:00Z",
+    "certificateValidTo": "2025-01-01T00:00:00Z",
+    "isCertificateValidAtSigningTime": true,
+    "signedAt": "2025-02-01T12:34:56Z",
+    "signatureBytesBase64": "cGRmLXNpZ25hdHVyZQ==",
+    "signatureBase64": "c29tZS1vdGhlci1zaWc=",
+    "fileId": "550e8400-e29b-41d4-a716-446655440000",
+    "fileName": "document.docx",
+    "fileHash": "ABCDEF1234567890"
+  }'

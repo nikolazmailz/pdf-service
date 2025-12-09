@@ -1,5 +1,4 @@
 --liquibase formatted sql
-
 --changeset signature:init-schema
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 

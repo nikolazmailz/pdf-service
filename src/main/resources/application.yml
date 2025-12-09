@@ -5,12 +5,23 @@ spring:
   application:
     name: pdf-service
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/sign_service
+    url: r2dbc:postgresql://localhost:5432/appdb
     username: postgres
-    password: password
+    password: postgres
+  datasource:
+    url: jdbc:postgresql://localhost:5432/appdb
+    username: postgres
+    password: postgres
+#  liquibase:
+#    enabled: true
+#    change-log: classpath:/db/changelog/db.changelog-master.yaml
+
   liquibase:
     enabled: true
-    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    url: jdbc:postgresql://postgres:5432/appdb
+    user: postgres
+    password: postgres
 
 converter:
   base-url: http://document-converter-service:8080
@@ -20,4 +31,5 @@ converter:
 logging:
   level:
     root: INFO
-
+    liquibase: INFO
+    org.springframework.boot.autoconfigure.liquibase: DEBUG

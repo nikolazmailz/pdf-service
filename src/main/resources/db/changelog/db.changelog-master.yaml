@@ -1,4 +1,4 @@
 databaseChangeLog:
   - include:
-      file: db/changelog/001-init-signature-table.sql
-
+      file: changes/001-init-signature-table.sql
+      relativeToChangelogFile: true

@@ -93,7 +93,3 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-springBoot {
-    mainClass.set("com.signservice.SignServiceApplication")
-}
-

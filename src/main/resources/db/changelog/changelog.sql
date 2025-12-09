@@ -1,9 +1,0 @@
-----liquibase formatted sql
---
-----changeset placeholder:init
-----changeset placeholder:init
---CREATE TABLE IF NOT EXISTS placeholder (
---    id UUID PRIMARY KEY,
---    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
---);
---
