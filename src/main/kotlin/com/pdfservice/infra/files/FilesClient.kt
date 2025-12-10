@@ -22,7 +22,7 @@ class FilesClient(
 //            .awaitBody()
 
     suspend fun downloadFile(fileId: UUID): ByteArray {
-        log.debug { "downloadFile $fileId" }
+        log.info { "downloadFile $fileId" }
         val resourcePath = "/example.docx"
 
         val resource = this::class.java.getResourceAsStream(resourcePath)
