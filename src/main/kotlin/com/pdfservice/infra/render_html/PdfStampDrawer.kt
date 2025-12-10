@@ -2,90 +2,132 @@ package com.pdfservice.infra.render_html
 
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode
+import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.springframework.stereotype.Service
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import javax.imageio.ImageIO
 
+/**
+ * Рисует PNG-штамп:
+ *  - если помещается в зарезервированную снизу область — на последней странице;
+ *  - иначе — создаёт новую страницу и рисует штамп на ней.
+ *
+ * contract: в оригинальном PDF/шаблоне снизу действительно есть свободная зона высотой reservedAreaHeight,
+ * куда текст документа не заходит.
+ */
 @Service
-class PdfStampDrawer {
+class PdfStampDrawer(
+    // высота "резервной" области под штампом (в поинтах, 1pt ~= 0.35 мм)
+    private val reservedAreaHeight: Float = 180f,
+    private val bottomMargin: Float = 20f,
+    private val sideMargin: Float = 20f
+) {
 
-    fun drawStampAtBottom(
+    fun drawStampSmart(
         originalPdf: ByteArray,
-        pngBytes: ByteArray,
-        bottomMargin: Float = 20f
+        pngBytes: ByteArray
     ): ByteArray {
-        val doc = Loader.loadPDF(originalPdf)
+        val doc: PDDocument = Loader.loadPDF(originalPdf)
         try {
-            val page = doc.getPage(doc.numberOfPages - 1)
-            val mediaBox = page.mediaBox
+            val lastPage = doc.getPage(doc.numberOfPages - 1)
+            val mediaBox = lastPage.mediaBox
 
-            val image = PDImageXObject.createFromByteArray(doc, pngBytes, "stamp")
+            // читаем PNG, чтобы знать реальные размеры
+            val bimg = ImageIO.read(ByteArrayInputStream(pngBytes))
+                ?: error("Cannot read PNG from bytes")
 
-            // Масштабируем картинку под ширину страницы (минус небольшие поля)
-            val maxWidth = mediaBox.width - 40f
-            val scale = maxWidth / image.width
-            val stampWidth = image.width * scale
-            val stampHeight = image.height * scale
+            // считаем итоговый размер штампа в поинтах, чтобы он влезал по ширине страницы
+            val stampSize = computeStampSize(mediaBox, bimg.width.toFloat(), bimg.height.toFloat())
 
-            val x = (mediaBox.width - stampWidth) / 2f
-            val y = bottomMargin
+            return if (stampSize.height <= reservedAreaHeight) {
+                // помещается в зарезервированную снизу область — рисуем на последней странице
+                drawOnPage(
+                    doc = doc,
+                    page = lastPage,
+                    mediaBox = mediaBox,
+                    pngBytes = pngBytes,
+                    stampWidth = stampSize.width,
+                    stampHeight = stampSize.height,
+                    // рисуем от bottomMargin вверх
+                    x = (mediaBox.width - stampSize.width) / 2f,
+                    y = bottomMargin
+                )
+                ByteArrayOutputStream().use { out ->
+                    doc.save(out)
+                    out.toByteArray()
+                }
+            } else {
+                // не помещается — создаём новую страницу и рисуем штамп на ней
+                val newPage = PDPage(mediaBox)
+                doc.addPage(newPage)
 
-            PDPageContentStream(doc, page, AppendMode.APPEND, true, true).use { cs ->
-                cs.drawImage(image, x, y, stampWidth, stampHeight)
+                // на новой странице можем рисовать повыше — например, от верхнего поля
+                val yTop = mediaBox.height - bottomMargin - stampSize.height
+                drawOnPage(
+                    doc = doc,
+                    page = newPage,
+                    mediaBox = mediaBox,
+                    pngBytes = pngBytes,
+                    stampWidth = stampSize.width,
+                    stampHeight = stampSize.height,
+                    x = (mediaBox.width - stampSize.width) / 2f,
+                    y = yTop
+                )
+
+                ByteArrayOutputStream().use { out ->
+                    doc.save(out)
+                    out.toByteArray()
+                }
             }
-
-            val out = ByteArrayOutputStream()
-            doc.save(out)
-            return out.toByteArray()
         } finally {
             doc.close()
         }
     }
 
+    private data class Size(val width: Float, val height: Float)
+
     /**
-     * Вставляет PNG штамп в конец последней страницы PDF
-     *
-     * @param originalPdf PDF исходного документа
-     * @param pngBytes PNG изображения штампа
-     * @param stampHeightPx высота штампа в пикселях (для масштабирования)
-     * @param dpi масштабирование (обычно 96 или 110)
+     * Подбираем масштаб штампа:
+     *  - по ширине: максимум (width - 2 * sideMargin)
+     *  - по высоте: не больше reservedAreaHeight (для проверки) — но сам масштаб одинаковый по X/Y
      */
-    fun drawStampAtBottom(
-        originalPdf: ByteArray,
+    private fun computeStampSize(
+        mediaBox: PDRectangle,
+        imgWidthPx: Float,
+        imgHeightPx: Float
+    ): Size {
+        val maxWidth = mediaBox.width - 2 * sideMargin
+        // масштаб в "поинтах на пиксель"
+        val scaleByWidth = maxWidth / imgWidthPx
+        // если хотим гарантированно влезть в reservedAreaHeight, можно учесть и её:
+//        val scaleByHeight = reservedAreaHeight / imgHeightPx
+
+        val scale = minOf(scaleByWidth, 0.9f)
+
+        val stampWidth = imgWidthPx * scale
+        val stampHeight = imgHeightPx * scale
+        return Size(stampWidth, stampHeight)
+    }
+
+    private fun drawOnPage(
+        doc: PDDocument,
+        page: PDPage,
+        mediaBox: PDRectangle,
         pngBytes: ByteArray,
-        stampHeightPx: Int,
-        dpi: Float = 96f,
-        bottomMargin: Float = 20f
-    ): ByteArray {
+        stampWidth: Float,
+        stampHeight: Float,
+        x: Float,
+        y: Float
+    ) {
+        val image = PDImageXObject.createFromByteArray(doc, pngBytes, "stamp")
 
-        val doc = Loader.loadPDF(originalPdf)
-
-        try {
-            val page = doc.getPage(doc.numberOfPages - 1)
-            val mediaBox = page.mediaBox
-
-            val pdImage = PDImageXObject.createFromByteArray(doc, pngBytes, "stamp")
-
-            // переводим px → PDF points
-            val scale = dpi / 72f
-            val stampWidth = pdImage.width / scale
-            val stampHeight = pdImage.height / scale
-
-            val x = (mediaBox.width - stampWidth) / 2f      // по центру
-            val y = bottomMargin                            // внизу
-
-            PDPageContentStream(doc, page, AppendMode.APPEND, true, true).use { cs ->
-                cs.drawImage(pdImage, x, y, stampWidth, stampHeight)
-            }
-
-            val out = ByteArrayOutputStream()
-            doc.save(out)
-            return out.toByteArray()
-
-        } finally {
-            doc.close()
+        PDPageContentStream(doc, page, AppendMode.APPEND, true, true).use { cs ->
+            cs.drawImage(image, x, y, stampWidth, stampHeight)
         }
     }
 }

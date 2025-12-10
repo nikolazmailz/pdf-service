@@ -1,11 +1,7 @@
 package com.pdfservice.infra.render_html
 
 import com.pdfservice.infra.pdf.dto.StampData
-import org.apache.pdfbox.Loader
-import org.apache.pdfbox.pdmodel.PDDocument
 import org.springframework.stereotype.Service
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 
 @Service
 class PdfStampAppender(
@@ -26,10 +22,9 @@ class PdfStampAppender(
         val stampPng = pdfToPngConverter.convertFirstPageToPng(stampPdfBytes, dpi = 144f)
 
         // 4. PNG вставляем в низ последней страницы исходного PDF
-        return drawer.drawStampAtBottom(
+        return drawer.drawStampSmart(
             originalPdf = originalPdf,
             pngBytes = stampPng,
-            bottomMargin = 20f
         )
 
 //        // 3. Склейка основных страниц и штампа
