@@ -7,6 +7,7 @@ import com.pdfservice.infra.files.FilesClient
 import com.pdfservice.infra.pdf.PdfStampService
 import com.pdfservice.infra.pdf.dto.SignerBlock
 import com.pdfservice.infra.pdf.dto.StampData
+import com.pdfservice.infra.render_html.PdfStampAppender
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
@@ -22,6 +23,7 @@ class GetSignedPdfUseCase(
     @Qualifier("poiDocxToPdfConverter")
     private val poiDocxToPdfConverter: DocxToPdfConverter,
     private val pdfStampService: PdfStampService,
+    private val pdfStampAppender: PdfStampAppender,
 ) {
 
     private val log = KotlinLogging.logger {}
@@ -41,7 +43,8 @@ class GetSignedPdfUseCase(
         log.info { "pdf ${pdf.size} \n $pdf \n" }
 
 //        val signedPdf = pdfSignatureService.applySignatureStampToPdf(pdf, signature)
-        val signedPdf = pdfStampService.addStampToPdf(
+//        val signedPdf = pdfStampService.addStampToPdf(
+        val signedPdf = pdfStampAppender.addStampPage(
             pdf, StampData(
                 documentId = signature.id.toString(),
                 systemName = signature.signerOrganization,

@@ -60,6 +60,17 @@ dependencies {
     // PDFBox для PDF
     implementation("org.apache.pdfbox:pdfbox:3.0.6")
 
+    // HTML → PDF
+//    implementation("com.openhtmltopdf:openhtmltopdf-core:1.0.10")
+//    implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10")
+    implementation("io.github.openhtmltopdf:openhtmltopdf-core:1.1.35")
+    implementation("io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.35")
+    implementation("io.github.openhtmltopdf:openhtmltopdf-java2d:1.1.35")
+//    implementation("com.openhtmltopdf:openhtmltopdf-slf4j:1.0.10")
+
+    // шаблонизатор
+    implementation("org.freemarker:freemarker:2.3.32")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
