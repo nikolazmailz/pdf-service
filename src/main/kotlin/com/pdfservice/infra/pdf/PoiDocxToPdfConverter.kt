@@ -14,7 +14,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 
-@Component
+@Component("poiDocxToPdfConverter")
 class PoiDocxToPdfConverter : DocxToPdfConverter {
 
     override suspend fun convert(docx: ByteArray): ByteArray = withContext(Dispatchers.IO) {

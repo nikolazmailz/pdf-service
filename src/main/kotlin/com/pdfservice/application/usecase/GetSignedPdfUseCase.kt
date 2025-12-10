@@ -16,6 +16,8 @@ class GetSignedPdfUseCase(
     private val pdfSignatureService: PdfSignatureService,
     @Qualifier("remoteDocxToPdfConverter")
     private val remoteDocxToPdfConverter: DocxToPdfConverter,
+    @Qualifier("poiDocxToPdfConverter")
+    private val poiDocxToPdfConverter: DocxToPdfConverter,
 ) {
 
     private val log = KotlinLogging.logger {}
@@ -30,7 +32,7 @@ class GetSignedPdfUseCase(
 
         log.info { "original ${original.size} \n $original \n" }
 
-        val pdf = remoteDocxToPdfConverter.convert(original)
+        val pdf = poiDocxToPdfConverter.convert(original)
 
         log.info { "pdf ${pdf.size} \n $pdf \n" }
 
