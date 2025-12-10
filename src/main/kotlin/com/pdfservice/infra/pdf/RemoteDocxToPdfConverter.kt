@@ -23,7 +23,6 @@ class RemoteDocxToPdfConverter(
         return webClient.post()
             .uri("/convert/docx-to-pdf")
             .contentType(MediaType.APPLICATION_OCTET_STREAM)
-//            .accept(MediaType.APPLICATION_PDF)
             .bodyValue(docx)
             .retrieve()
             .bodyToMono(ByteArray::class.java)

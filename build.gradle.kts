@@ -54,9 +54,6 @@ dependencies {
     // парсить/работать с CMS/PKCS#7 (подписи, сертификаты и т.п.)
     implementation("org.bouncycastle:bcpkix-jdk18on:1.83")
 
-    // PDF processing
-//    implementation("org.apache.pdfbox:pdfbox:2.0.30")
-
     // Apache POI для DOCX
     implementation("org.apache.poi:poi-ooxml:5.3.0")
 
