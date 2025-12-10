@@ -32,7 +32,7 @@ class GetSignedPdfUseCase(
 
         log.info { "original ${original.size} \n $original \n" }
 
-        val pdf = poiDocxToPdfConverter.convert(original)
+        val pdf = remoteDocxToPdfConverter.convert(original)
 
         log.info { "pdf ${pdf.size} \n $pdf \n" }
 
