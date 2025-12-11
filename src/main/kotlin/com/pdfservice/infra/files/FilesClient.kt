@@ -4,7 +4,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.awaitBody
 import java.util.UUID
 
 @Component
@@ -23,7 +22,7 @@ class FilesClient(
 
     suspend fun downloadFile(fileId: UUID): ByteArray {
         log.info { "downloadFile $fileId" }
-        val resourcePath = "/example.docx"
+        val resourcePath = "/example_big.docx"
 
         val resource = this::class.java.getResourceAsStream(resourcePath)
             ?: throw IllegalArgumentException("Fake file not found: $resourcePath")

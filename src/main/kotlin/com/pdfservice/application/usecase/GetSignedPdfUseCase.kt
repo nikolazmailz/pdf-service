@@ -8,6 +8,7 @@ import com.pdfservice.infra.pdf.PdfStampService
 import com.pdfservice.infra.pdf.dto.SignerBlock
 import com.pdfservice.infra.pdf.dto.StampData
 import com.pdfservice.infra.render_html.PdfStampAppender
+import com.pdfservice.infra.render_html.PdfStampAppender2
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
@@ -23,7 +24,7 @@ class GetSignedPdfUseCase(
     @Qualifier("poiDocxToPdfConverter")
     private val poiDocxToPdfConverter: DocxToPdfConverter,
     private val pdfStampService: PdfStampService,
-    private val pdfStampAppender: PdfStampAppender,
+    private val pdfStampAppender: PdfStampAppender2,
 ) {
 
     private val log = KotlinLogging.logger {}
@@ -63,7 +64,22 @@ class GetSignedPdfUseCase(
                         signingTimeLines = listOf<String>(
                             signature.signedAt.toString()
                         ),
-                    )
+                    ),
+                    SignerBlock(
+                        signerBlockLines = listOf<String>(
+                            signature.signerPosition,
+                            signature.signerName
+                        ),
+                        certificateLines = listOf<String>(
+                            signature.signerOrganization,
+                            signature.certificateSerialNumber,
+                            signature.certificateValidFrom.toString(),
+                            signature.certificateValidTo.toString()
+                        ),
+                        signingTimeLines = listOf<String>(
+                            signature.signedAt.toString()
+                        ),
+                    ),
                 ),
             )
         )

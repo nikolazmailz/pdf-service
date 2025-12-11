@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ID подписи (замени на нужный UUID)
-SIGNATURE_ID="23a5d210-0e35-41dc-a25f-e49970533d1e"
+SIGNATURE_ID="d812b5ef-4876-46d5-b82c-d8b1f1ed9a76"
 
 # Куда сохранить PDF
 OUTPUT_FILE="signed-$SIGNATURE_ID.pdf"
