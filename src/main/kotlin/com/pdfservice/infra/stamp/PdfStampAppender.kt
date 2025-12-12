@@ -1,6 +1,7 @@
 package com.pdfservice.infra.stamp
 
 import com.pdfservice.infra.pdf.dto.StampData
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
@@ -11,6 +12,7 @@ import org.apache.pdfbox.text.PDFTextStripper
 import org.apache.pdfbox.text.TextPosition
 import org.springframework.stereotype.Service
 import java.io.ByteArrayOutputStream
+import kotlin.system.measureTimeMillis
 
 @Service
 class PdfStampAppender(
@@ -18,6 +20,8 @@ class PdfStampAppender(
     private val htmlToPdfConverter: HtmlToPdfConverter,
     private val pdfToPngConverter: PdfToPngConverter,
 ) {
+
+    private val log = KotlinLogging.logger {}
 
     private val STAMP_DPI = 144f
 
@@ -29,18 +33,30 @@ class PdfStampAppender(
      * @return новый PDF с добавленным штампом как ByteArray
      */
     fun addStampPage(originalPdf: ByteArray, stampData: StampData): ByteArray {
-        // 1. генерим HTML по шаблону
-        val htmlTemplate = stampTemplateRenderer.getHtmlTemplate(stampData)
+        val htmlTemplate: String
+        val htmlRenderDuration = measureTimeMillis {
+            htmlTemplate = stampTemplateRenderer.getHtmlTemplate(stampData)
+        }
+        log.info { "stamp html template rendered in ${htmlRenderDuration}ms" }
 
-        // 2. HTML → PDF (штамп как отдельный документ, обычно одна страница)
-        val stampPdfBytes: ByteArray = htmlToPdfConverter.convert(htmlTemplate)
+        val stampPdfBytes: ByteArray
+        val htmlToPdfDuration = measureTimeMillis {
+            stampPdfBytes = htmlToPdfConverter.convert(htmlTemplate)
+        }
+        log.info { "stamp html to pdf converted in ${htmlToPdfDuration}ms" }
 
-        // 3. Берём первую страницу этого PDF и конвертим её в PNG
-        val stampPngBytes: ByteArray =
-            pdfToPngConverter.convertFirstPageToPng(stampPdfBytes, dpi = 144f)
+        val stampPngBytes: ByteArray
+        val pdfToPngDuration = measureTimeMillis {
+            stampPngBytes = pdfToPngConverter.convertFirstPageToPng(stampPdfBytes, dpi = STAMP_DPI)
+        }
+        log.info { "stamp pdf to png converted in ${pdfToPngDuration}ms" }
 
-        // 4. Встраиваем PNG как картинку в конец исходного PDF
-        return addSignatureImageToPdf(originalPdf, stampPngBytes)
+        val stampedPdf: ByteArray
+        val addSignatureDuration = measureTimeMillis {
+            stampedPdf = addSignatureImageToPdf(originalPdf, stampPngBytes)
+        }
+        log.info { "stamp image appended to pdf in ${addSignatureDuration}ms" }
+        return stampedPdf
     }
 
     fun addSignatureImageToPdf(
