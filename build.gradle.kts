@@ -7,7 +7,7 @@ plugins {
     kotlin("plugin.spring") version "1.9.24"
 }
 
-group = "com.signservice"
+group = "com.pdfservice"
 version = "0.1.0"
 java {
     toolchain {

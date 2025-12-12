@@ -1,4 +1,4 @@
-package com.pdfservice.infra.render_html
+package com.pdfservice.infra.stamp
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
 import org.springframework.stereotype.Service
@@ -7,7 +7,7 @@ import java.io.ByteArrayOutputStream
 @Service
 class HtmlToPdfConverter {
 
-    fun convert(html: String): ByteArray {
+    fun convert(htmlTemplate: String): ByteArray {
         val out = ByteArrayOutputStream()
 
         val builder = PdfRendererBuilder()
@@ -22,7 +22,7 @@ class HtmlToPdfConverter {
         )
 
         builder.useFastMode()
-        builder.withHtmlContent(html, null)
+        builder.withHtmlContent(htmlTemplate, null)
         builder.toStream(out)
 
         builder.run()

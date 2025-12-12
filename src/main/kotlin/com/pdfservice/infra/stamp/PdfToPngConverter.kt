@@ -1,12 +1,12 @@
-package com.pdfservice.infra.render_html
+package com.pdfservice.infra.stamp
 
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.rendering.ImageType
 import org.apache.pdfbox.rendering.PDFRenderer
 import org.springframework.stereotype.Service
+import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
-import java.awt.image.BufferedImage
 import kotlin.math.abs
 
 @Service

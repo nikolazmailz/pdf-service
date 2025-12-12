@@ -14,7 +14,6 @@ class GetFileHashUseCase(
 ) {
 
     suspend fun execute(fileId: UUID): FileHashDto {
-//        require(fileId.isNotBlank()) { "fileId is required" }
         val bytes = filesClient.downloadFile(fileId)
         val hash = hashingService.calculateGostHash(bytes)
         return FileHashDto(fileId = fileId, hash = hash)

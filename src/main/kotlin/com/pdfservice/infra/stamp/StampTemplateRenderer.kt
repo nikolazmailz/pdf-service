@@ -1,4 +1,4 @@
-package com.pdfservice.infra.render_html
+package com.pdfservice.infra.stamp
 
 import com.pdfservice.infra.pdf.dto.StampData
 import freemarker.template.Configuration
@@ -17,7 +17,7 @@ class StampTemplateRenderer {
         wrapUncheckedExceptions = true
     }
 
-    fun renderStampHtml(stampData: StampData): String {
+    fun getHtmlTemplate(stampData: StampData): String {
         val template = cfg.getTemplate("stamp.ftl")
 
         val model = mapOf(

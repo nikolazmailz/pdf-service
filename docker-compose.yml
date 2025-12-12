@@ -1,13 +1,13 @@
 version: "3.9"
 
 services:
-  document-converter-service:
-    image: document-converter-service:latest
-    container_name: document-converter-service
-    ports:
-      - "8080:8080"
-    networks:
-      - internal
+#  document-converter-service:
+#    image: document-converter-service:latest
+#    container_name: document-converter-service
+#    ports:
+#      - "8080:8080"
+#    networks:
+#      - internal
 
   pdf-service:
     image: pdf-service:latest
@@ -23,7 +23,7 @@ services:
       - SPRING_R2DBC_USERNAME=postgres
       - SPRING_R2DBC_PASSWORD=postgres
     depends_on:
-      - document-converter-service
+#      - document-converter-service
       - postgres
     ports:
       - "8081:8080"
